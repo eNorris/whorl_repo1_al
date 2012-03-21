@@ -1,0 +1,310 @@
+package edu.mst.cs206.e;
+
+// DONE.
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Random;
+
+/**\
+ * 
+ * @author etnc6d
+ * 
+ * Class : MetricNode
+ *
+ */
+public class MetricNode {
+	
+	// TODO Implement some static integers for 0 => 'DIT' mapping
+	
+	// A random number generator that all MetricNode objects
+	//  have access to. This value is used for all randomization
+	//  routines
+	public static Random generator = null;
+	
+	// Value of the metric if the metric is a leaf
+	//  0 => DIT        - Depth of Inheritance Tree
+	//  1 => LOCCLASS   - Lines of Code in Class
+	//  2 => LOCMETHOD  - Lines of Code in Method
+	//  3 => NMD        - Number of Methods in Class
+	//  4 => NACC       - Number of accessor functions
+	//  5 => CBO        - Coupling Value
+	public int metricValue;
+	
+	// distinguishes between leaf nodes and non-leaf nodes
+	public boolean isLeaf;
+	
+	// Defined only for leaf nodes, determines whether the
+	//  metric will be greater than the threshold value or less
+	//  than the threshold value
+	public boolean greaterThan;
+	
+	// Defined only for leaf nodes, the threshold value that
+	//  the metric will be compared to
+	public int threshold;
+	
+	// Defined only for non-leaf nodes, determines whther the
+	//  non-leaf node will represent an AND or an OR operation
+	public boolean opAND;
+	
+	// The probability that any given node will have children
+	// complexity = [0,1]
+	public double complexity;
+	
+	// The depth of the node in the tree. The root corresponds
+	//  to depth 0
+	public int depth;
+	
+	// The maximum depth the tree is allowed to grow to. For any
+	//  node, if its child's depth would exceen maxDepth, upon
+	//  calling grow(), the node will not have children 
+	//  regardless of the complexity value
+	public int maxDepth;
+	
+	// MetricNode pointers to the left child, right child, and
+	//  parent respectively
+	public MetricNode l;
+	public MetricNode r;
+	public MetricNode p;
+	
+	// A list of the possible minimum and maximum values a 
+	//  threshold can take on for any given leaf node.
+	//  ie. IF metricValue = k THEN
+	//      thresholdMin[k] <= threshold <= thresholdMax[k]
+	public static Integer[] thresholdMin = null;
+	public static Integer[] thresholdMax = null;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param maxComplexity
+	 * 	The maximum complexity that will be chosen. The 
+	 * complexity is chosen randomly on [0,maxComplexity]. 
+	 * Each node in a given tree will have the same complexity
+	 * 
+	 * @param terminalDepth
+	 * 	The maximum possible depth of the tree that will be
+	 * generated. 
+	 */
+	public MetricNode(double maxComplexity, int terminalDepth){
+		// Initialize the random generator if not already initialized
+		if(generator == null){
+			generator = new Random();
+		}
+		
+		// Initialize the values of the root
+		metricValue = Math.abs(generator.nextInt()) % 6;
+		greaterThan = generator.nextBoolean();
+		opAND = generator.nextBoolean();
+		
+		// If the thresholds have not been loaded, output a warning and choose one 
+		// at total random
+		if(thresholdMax == null || thresholdMin == null){
+			threshold = generator.nextInt() % 1000;
+		}else{
+			// In case the min and max thresholds are the same, this will avert a divide
+			// by zero error
+			if(thresholdMax[metricValue] == thresholdMin[metricValue]){
+				threshold = thresholdMax[metricValue];
+			}else{
+				threshold = Math.abs(generator.nextInt()) % 
+					(thresholdMax[metricValue] - thresholdMin[metricValue]) + 
+					thresholdMin[metricValue];
+			}
+		}
+		
+		complexity = maxComplexity;
+		depth = 0;
+		maxDepth = terminalDepth;
+		
+		// Assume root conditions
+		l = null;
+		r = null;
+		p = null;
+		isLeaf = true;
+		
+	}
+	
+	public void grow(){
+		double complexityCap = generator.nextDouble();
+		
+		// Decide CAN I have children and am I complex enough to have children.
+		// If so, Spawn a left and a right child and recurse onto them
+		if(complexity > complexityCap && depth < maxDepth){ 
+			isLeaf = false;
+			
+			// Set the operator to AND or OR
+			opAND = generator.nextBoolean();
+			
+			// Recurse on the left child
+			l = new MetricNode(complexity, maxDepth);
+			l.depth = depth + 1;
+			l.p = this;
+			l.grow();
+			
+			// Recurse on the right child
+			r = new MetricNode(complexity, maxDepth);
+			r.depth = depth + 1;
+			r.p = this;
+			r.grow();
+		}
+	}
+		
+	// this should be run BEFORE any MetricNode objects are ever created!!
+	public static boolean parseThresholds(String filename) throws IOException{
+		
+		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		
+		String line = null;
+		
+		boolean[] found = {false, false, false, false, false, false};
+		
+		thresholdMin = new Integer[6];
+		thresholdMax = new Integer[6];
+		
+		for(int i = 0; i < 6; i++){
+			thresholdMin[i] = new Integer(0);
+			thresholdMax[i] = new Integer(10);
+		}
+		
+		while((line=reader.readLine()) != null){
+			
+			String[] tokens = line.split(" ");
+			
+			if(tokens.length != 3){
+				System.out.print("ERROR: MetricNode::parseThresholds(): did not get 3 tokens\n\n");
+				return false;
+			}
+			
+			
+			if(tokens[0].equals("DIT")){
+				thresholdMin[0] = Integer.parseInt(tokens[1]);
+				thresholdMax[0] = Integer.parseInt(tokens[2]);
+				found[0] = true;
+			}else if (tokens[0].equals("LOCCLASS")){
+				thresholdMin[1] = Integer.parseInt(tokens[1]);
+				thresholdMax[1] = Integer.parseInt(tokens[2]);
+				found[1] = true;
+			}else if (tokens[0].equals("LOCMETHOD")){
+				thresholdMin[2] = Integer.parseInt(tokens[1]);
+				thresholdMax[2] = Integer.parseInt(tokens[2]);
+				found[2] = true;
+			}else if (tokens[0].equals("NMD")){
+				thresholdMin[3] = Integer.parseInt(tokens[1]);
+				thresholdMax[3] = Integer.parseInt(tokens[2]);
+				found[3] = true;
+			}else if (tokens[0].equals("NACC")){
+				thresholdMin[4] = Integer.parseInt(tokens[1]);
+				thresholdMax[4] = Integer.parseInt(tokens[2]);
+				found[4] = true;
+			}else if (tokens[0].equals("CBO")){
+				thresholdMin[5] = Integer.parseInt(tokens[1]);
+				thresholdMax[5] = Integer.parseInt(tokens[2]);
+				found[5] = true;
+			}else{
+				System.out.print("ERROR: MetricNode::parseThresholds(): Could not interpret \""+tokens[0]+"\"\n\n");
+//				return false;
+			}
+		}
+		
+		for(int i = 0; i < found.length; i++){
+			if(!found[i]){
+				System.out.print("ERROR: MetricNode::parseThrehsolds(): Did not get a "+metricName(i)+" threshold\n\n");
+//				return false;
+			}
+		}
+		
+		reader.close();
+		
+		return true;
+	}
+	
+	public static String outputThresholds(){
+		if(thresholdMin == null){
+			return "THRESHOLDS NOT LOADED\n\n";
+		}
+		
+		String toReturn = new String();
+		
+		for(int i = 0; i < 6; i++){
+			toReturn += (metricName(i)+" : "+thresholdMin[i]+" - "+thresholdMax[i]+"\n");
+		}
+		return toReturn;
+	}
+	
+	public static String metricName(int metricVal){
+		if(metricVal == 0){
+			return "DIT";
+		}else if (metricVal == 1){
+			return "LOCCLASS";
+		}else if (metricVal == 2){
+			return "LOCMETHOD";
+		}else if (metricVal == 3){
+			return "NMD";
+		}else if (metricVal == 4){
+			return "NACC";
+		}else if (metricVal == 5){
+			return "CBO";
+		}else{
+			return "ERROR";
+		}
+	}
+	
+	
+	public String toString(){
+		/*
+		 *        A
+		 *       / \
+		 *      B   C
+		 * 
+		 * output as : (B A C)
+		 */
+		String toReturn = new String();
+		
+		if(isLeaf){
+	//		String r = new String();
+//			toReturn = "m";
+//			toReturn += Integer.toString(metricValue);
+			toReturn += metricName(metricValue);
+			if(greaterThan){
+				toReturn += " > ";
+			}else{
+				toReturn += " < ";
+			}
+			toReturn += Integer.toString(threshold);
+
+//				return r;
+		}else{
+			toReturn += "(";
+			toReturn += l.toString();
+			if(opAND == true){
+				toReturn += " AND ";
+			}else{
+				toReturn += " OR ";
+			}
+			toReturn += r.toString();
+			toReturn += ")";
+		}
+		
+		return toReturn;
+	
+//		return "cat";
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

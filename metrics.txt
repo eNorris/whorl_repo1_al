@@ -1,0 +1,5 @@
+Class Zoo 1 2 3 4 5 6
+Class Cat 6 6 6 6 6 6
+Class Lion 8 2 4 1 3 6
+Method Roar 1 1 2 0 0 0
+Method Meow 3 3 5 0 0 9
