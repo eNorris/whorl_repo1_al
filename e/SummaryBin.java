@@ -7,7 +7,7 @@ import java.util.Vector;
 /**
  * Data container class for the summary that will either be read in or generated
  * 
- * @author etnc6d
+ * @author Eric Noles, Thomas Clay, Edward Norris
  *
  */
 public class SummaryBin {

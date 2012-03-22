@@ -6,7 +6,7 @@ import java.util.Vector;
  * Class containing a set of rules (ie MetricNodes) and data that will be used to generated more rules
  * according to certain complexity and size constraints
  * 
- * @author etnc6d
+ * @author Edward Norris, Eric Noles
  *
  */
 public class RuleSet {

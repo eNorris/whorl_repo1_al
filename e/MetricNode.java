@@ -19,7 +19,7 @@ import java.util.Random;
  * Each rule stores information about whether or not it is a leaf as well as all values it would need regardless.
  * Any node is, at any given moment, either a leaf or a non-leaf, though it has all the attributes to be either
  * 
- * @author etnc6d
+ * @author Edward Norris
  *
  */
 public class MetricNode {

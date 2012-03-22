@@ -18,7 +18,7 @@ import java.util.Vector;
  * Where each of the values following the name of the class/method correspond to the DIT, LOCCLASS, LOCMETHOD,
  * NMD, NACC, and CBO in that order
  * 
- * @author etnc6d
+ * @author Eric Noles, Edward Norris
  *
  */
 public class MetricBin {

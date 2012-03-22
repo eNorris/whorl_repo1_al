@@ -3,12 +3,13 @@ import java.io.IOException;
 
 //FIXME Allow the user to enter the filenames
 //FIXME Correct author names, Edward didn't do everything!
+//TODO Add logging
 
 
 /**
  * The main class that launches the program. Contians only the main() function
  * 
- * @author etnc6d
+ * @author Edward Norris, Eric Noles, Thomas Clay
  *
  */
 public class Main {
@@ -16,7 +17,8 @@ public class Main {
 	private static String metricsFilename = "C:\\temp\\metrics.txt";
 	private static String thresholdsFilename = "C:\\temp\\thresholds.txt";
 	private static String summaryFilename = "C:\\temp\\summary1.txt";
-	private static String crossValidationFilename = "C:\\temp\\crossVal.txt";
+	private static String crossValidationSummaryFilename = "C:\\temp\\sys2Sum.txt";
+	private static String crossValidationMetricsFilename = "C:\\temp\\sys2Metrics.txt";
 	
 	/**
 	 * The main function that runs the program
@@ -28,9 +30,11 @@ public class Main {
 		
 		// Create the metrics values
 		MetricBin inputMetrics = new MetricBin();
+		MetricBin sys2Metrics = new MetricBin();
 		
 		// Create the base of example summary
 		SummaryBin inputSummary = new SummaryBin();
+		SummaryBin sys2Summary  = new SummaryBin();
 		
 		// Attempt to read in the metrics file
 		try {
@@ -44,8 +48,19 @@ public class Main {
 			return;
 		}
 		
+		// Attempt to read the metrics file for the cross validation step
+		try {
+			if(!sys2Metrics.parseMetrics(crossValidationMetricsFilename)){
+				System.out.print("ERROR: Main::main(): could not parse metrics file \"" + crossValidationMetricsFilename + "\"\n\n");
+				return;
+			}
+		} catch (IOException e) {
+			System.out.print("Error, could not find file \"" + crossValidationMetricsFilename + "\"\n\n");
+			e.printStackTrace();
+			return;
+		}
+		
 		// Attempt to read in the thresholds file
-//		System.out.print(MetricNode.outputThresholds());
 		try {
 			if(!MetricNode.parseThresholds(thresholdsFilename)){
 				System.out.print("ERROR: Main::main(): could not parse thresholds file \"" + thresholdsFilename + "\"\n\n");
@@ -56,10 +71,8 @@ public class Main {
 			e.printStackTrace();
 			return;
 		}
-//		System.out.print(MetricNode.outputThresholds());
 		
 		// Attempt to read in the base of example file
-//		System.out.print(inputSummary.toString());
 		try{
 			if(!inputSummary.parseSummary(summaryFilename)){
 				System.out.print("ERROR: Main::main(): could not parse summary file \"" + summaryFilename + "\"\n\n");
@@ -70,7 +83,18 @@ public class Main {
 			e.printStackTrace();
 			return;
 		}
-//		System.out.print(inputSummary.toString());
+		
+		// Attempt to read in the base of example file for system 2
+		try{
+			if(!sys2Summary.parseSummary(crossValidationSummaryFilename)){
+				System.out.print("ERROR: Main::main(): could not parse summary file \"" + crossValidationSummaryFilename + "\"\n\n");
+				return;
+			}
+		} catch (IOException e){
+			System.out.print("Error, could not find file \"" + crossValidationSummaryFilename + "\"\n\n");
+			e.printStackTrace();
+			return;
+		}
 		
 		// Generate the temporary variables
 		RuleSet testRules = new RuleSet();
@@ -101,12 +125,19 @@ public class Main {
 		}
 		
 //		double crossVal = eval.crossValidation(inputSummary, bestSummary, bestRuleSet, inputMetrics);
+		Evaluator.DataBundle crossValResults = new Evaluator.DataBundle();
+//		crossValResults = eval.crossValidation(bestSummary, bestRuleSet, crossValMetrics);
+		crossValResults = eval.crossValidation(bestRuleSet, sys2Summary, sys2Metrics);
 		
 		System.out.print("\n\n     ***** SOLUTION *****     \n");
 		System.out.print("\nBest RuleSet: \n"+bestRuleSet.toString()+"\n");
 		System.out.print("Fitness: "+String.valueOf(bestFitness)+"\n\n");
-//		System.out.print("Cross Validation Value: " + crossVal + "\n\n");
 		System.out.print("Base of Example: \n" + inputSummary.toString()+"\n");
-		System.out.print("Generated Summary: \n" + bestSummary + "\n\n\n");
+		System.out.print("Generated Summary: \n" + bestSummary + "\n\n");
+		
+		System.out.print("Cross Validation Summary: \n" + crossValResults.crossValSummary.toString() + "\n");
+		System.out.print("Cross Validation Precision: " + crossValResults.precision + "\n");
+		System.out.print("Cross Validation Recall: " + crossValResults.recall + "\n");
+		System.out.print("Cross Validation Overall Fitness: " + crossValResults.fitness + "\n\n\n");
 	}
 }

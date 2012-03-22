@@ -1,5 +1,5 @@
 package edu.mst.cs206.e;
-import java.io.IOException;
+//import java.io.IOException;
 
 //FIXME Fix the cross evaluation
 
@@ -8,10 +8,34 @@ import java.io.IOException;
  * <br><br>
  * 
  * 
- * @author etnc6d
+ * @author Edward Norris, Eric Noles
  *
  */
 public class Evaluator {
+	
+	/**
+	 * Data Container class - Contains results from cross Validation step bundled together
+	 * 
+	 * @author etnc6d
+	 *
+	 */
+	public static class DataBundle{
+		public double precision;
+		public double recall;
+		public double fitness;
+		public SummaryBin crossValSummary;
+		
+		/**
+		 * Default Constructor - Initalizes all variables to zero
+		 */
+		public DataBundle(){
+			precision = 0;
+			recall = 0;
+			fitness = 0;
+			crossValSummary = null;
+		}
+	}
+	
 	
 	/**
 	 * Default Constructor
@@ -36,8 +60,12 @@ public class Evaluator {
 	 * 	The fitness of the two summaries
 	 */
 	public double fitness(SummaryBin summary1, SummaryBin summary2){
+		return ((precision(summary1, summary2)+recall(summary1, summary2)) / 2.0);
+/*
 		double numerator=0;
 		double fit;
+		// For every element in the first summary, cross reference it with every element in
+		// the second summary. Count the matches
 		for(int i=0; i < summary1.name.size(); i++){
 			for(int j=0; j < summary2.name.size(); j++){
 				if(summary1.name.elementAt(i).equals(summary2.name.elementAt(j)) 
@@ -46,7 +74,73 @@ public class Evaluator {
 				}
 			}
 		}
+		// The fitness is the matches over the averate size of the two summaries
 		fit = ((numerator/summary1.name.size())+(numerator/summary2.name.size()))/2;
+		return fit;
+*/
+	}
+	
+	
+	/**
+	 * Returns the precision of the two summaries
+	 * <br>
+	 * Precision: Number of common code element sbetween the manaul and the generated
+	 * summaries / number o fcode elements in the manual summary
+	 * @param genSummary
+	 * 	The summary generated previously by the code
+	 * @param baseSummary
+	 * 	The base of example summary
+	 * @return
+	 * 	The precision of the two summaries
+	 */
+	public double precision(SummaryBin genSummary, SummaryBin baseSummary){
+		double numerator=0;
+		double fit;
+		// For every element in the first summary, cross reference it with every element in
+		// the second summary. Count the matches
+		for(int i=0; i < genSummary.name.size(); i++){
+			for(int j=0; j < baseSummary.name.size(); j++){
+				if(genSummary.name.elementAt(i).equals(baseSummary.name.elementAt(j)) 
+						&& genSummary.isClass.elementAt(i).equals(baseSummary.isClass.elementAt(j))){
+					numerator++;
+				}
+			}
+		}
+		// The fitness is the matches over the averate size of the two summaries
+//		fit = ((numerator/summary1.name.size())+(numerator/summary2.name.size()))/2;
+		fit = numerator/baseSummary.name.size();
+		return fit;
+	}
+	
+	
+	/**
+	 * Returns the recall of the two summaries
+	 * <br>
+	 * Precision: Number of common code element sbetween the manaul and the generated
+	 * summaries / number o fcode elements in the generated summary
+	 * @param genSummary
+	 * 	The summary generated previously by the code
+	 * @param baseSummary
+	 * 	The base of example summary
+	 * @return
+	 * 	The recall of the two summaries
+	 */
+	public double recall(SummaryBin genSummary, SummaryBin baseSummary){
+		double numerator=0;
+		double fit;
+		// For every element in the first summary, cross reference it with every element in
+		// the second summary. Count the matches
+		for(int i=0; i < genSummary.name.size(); i++){
+			for(int j=0; j < baseSummary.name.size(); j++){
+				if(genSummary.name.elementAt(i).equals(baseSummary.name.elementAt(j)) 
+						&& genSummary.isClass.elementAt(i).equals(baseSummary.isClass.elementAt(j))){
+					numerator++;
+				}
+			}
+		}
+		// The fitness is the matches over the averate size of the two summaries
+//		fit = ((numerator/summary1.name.size())+(numerator/summary2.name.size()))/2;
+		fit = numerator/genSummary.name.size();
 		return fit;
 	}
 	
@@ -68,9 +162,10 @@ public class Evaluator {
 		
 		SummaryBin toReturn = new SummaryBin();
 		
-		// For every metric
+		// For every metric, for every rule that can evaluate it...
 		for(int i = 0; i < metrics.metricValues.size(); i++){
 			for(int j = 0; j < rules.numRules; j++){
+				// If that metric passes the rule, add it to the summary
 				if(executeRule(rules.accessRule(j), metrics, i)){
 						toReturn.isClass.add(metrics.classes.elementAt(i));
 						toReturn.name.add(metrics.names.elementAt(i));
@@ -98,7 +193,8 @@ public class Evaluator {
 	 * 	True if the metric should be added to the summary false otherwise
 	 */
 	public boolean executeRule(MetricNode rule, MetricBin metrics, int index){
-		
+		// Either I'm a leaf or not; If I'm a leaf, Either the threshold is greater than or less than the
+		// acutal value, test all cases.
 		if(rule.isLeaf){
 			if(rule.greaterThan){
 				return (metrics.metricValues.elementAt(index)[rule.metricValue] > rule.threshold);
@@ -109,28 +205,57 @@ public class Evaluator {
 			if(rule.opAND){
 				return (executeRule(rule.l, metrics, index) && executeRule(rule.r, metrics, index));
 			}else{
-				return (executeRule(rule.l, metrics, index) && executeRule(rule.r, metrics, index));
+				return (executeRule(rule.l, metrics, index) || executeRule(rule.r, metrics, index));
 			}
 		}
 	}
 	
-	// takes as input: the final generated summary(genSummary)
-	// takes as input: the ruleset used to generate summary 2
+
 	/**
 	 * Determines the fitness of a provided summary and a second summary that is generated by the funciton.
 	 * 
 	 * @param baseSummary
 	 * 	
 	 * @param genSummary
-	 * @param rules
-	 * @param baseMetrics
+	 * @param genRules
+	 * @param secondMetrics
 	 * @return
 	 */
-    double crossValidation(SummaryBin baseSummary, SummaryBin genSummary, RuleSet rules, MetricBin baseMetrics){
+	
+	/**
+	 * Generates a new summary using the metrics for system two and the ruleset generated with system 1.
+	 * After this is done, the precison, recall, and fitness are all returned as well as the new summary
+	 * that was generated
+	 * 
+	 * @param sys1RuleSet
+	 * 	The ruleset that was generated by repeatedly generating new rulesets and comparing their fitness
+	 * @param sys2Summary
+	 * 	A user generated summary that represents the target summary for the cross validation
+	 * @param sys2Metrics
+	 * 	The metrics that compose the second system.
+	 * @return
+	 * 	A DataBundle that contains the precision, recall, fitness and summary generated
+	 */
+    public DataBundle crossValidation(RuleSet sys1RuleSet, SummaryBin sys2Summary, MetricBin sys2Metrics){
+//   		SummaryBin sys1Summary, RuleSet sys1Rules, MetricBin sys2Metrics){
     	
-    	double fit1, fit2;
+    	DataBundle toReturn = new DataBundle();
     	
-    	MetricBin genMetrics = new MetricBin();
+    	// Make a new Evaluator and use it to generate a summary
+    	Evaluator evalor  = new Evaluator();
+    	SummaryBin sys2NewSummary =evalor.executeRuleSet(sys1RuleSet, sys2Metrics);
+    	
+    	// sys2NewSummary is now the generated summary and sys2Summary which was parsed earlier is acting as
+    	// the base of example for this step
+    	toReturn.precision = precision(sys2NewSummary, sys2Summary);
+    	toReturn.recall = recall(sys2NewSummary, sys2Summary);
+    	toReturn.fitness = fitness(sys2NewSummary, sys2Summary);
+    	toReturn.crossValSummary = sys2NewSummary;
+    	
+    	return toReturn;
+//    	double fit1, fit2;
+    	
+//    	MetricBin genMetrics = new MetricBin();
 //		genMetrics.parseThresholds("Filename2.txt");
     	/*try{
     		genMetrics.parseMetrics("filename.txt");
@@ -138,7 +263,7 @@ public class Evaluator {
 		genMetrics.parseMetrics("filename.txt");*/
 		
 		
-		
+/*
 		try {
 			if(!genMetrics.parseMetrics("filename.txt")){
 				System.out.print("ERROR: Main::main(): could not parse metrics file");
@@ -147,7 +272,8 @@ public class Evaluator {
 			System.out.print("Error, could not find file");
 			e.printStackTrace();
 		}
-		
+*/
+/*		
 		Evaluator eval = new Evaluator();
 		
 		// baseSummary is a summary generated with metrics from system2, and the rules used to generate the
@@ -186,6 +312,6 @@ public class Evaluator {
     	double avgFit = (fit1 + fit2) / 2;
     	
     	return avgFit;
-    	
+*/
     }
 }
