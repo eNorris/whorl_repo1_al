@@ -4,7 +4,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
 
-
+/**
+ * Data container class
+ * @author etnc6d
+ *
+ */
 public class SummaryBin {
 	public Vector<String> name;
 	public Vector<Boolean> isClass;
