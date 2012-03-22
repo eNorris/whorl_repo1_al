@@ -1,8 +1,9 @@
 package edu.mst.cs206.e;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 //FIXME Allow the user to enter the filenames
-//FIXME Correct author names, Edward didn't do everything!
 //TODO Add logging
 
 
@@ -13,12 +14,20 @@ import java.io.IOException;
  *
  */
 public class Main {
-	
+
+/*
 	private static String metricsFilename = "C:\\temp\\metrics.txt";
 	private static String thresholdsFilename = "C:\\temp\\thresholds.txt";
 	private static String summaryFilename = "C:\\temp\\summary1.txt";
 	private static String crossValidationSummaryFilename = "C:\\temp\\sys2Sum.txt";
 	private static String crossValidationMetricsFilename = "C:\\temp\\sys2Metrics.txt";
+*/
+	
+	private static String m_userSys1MetricsFilename = new String();
+	private static String m_userSys2MetricsFilename = new String();
+	private static String m_userSys1SummaryFilename = new String();
+	private static String m_userSys2SummaryFilename = new String();
+	private static String m_userThresholdsFilename = new String();
 	
 	/**
 	 * The main function that runs the program
@@ -27,6 +36,10 @@ public class Main {
 	 * 	The arguments recieved from a command line. Any sent are ignored
 	 */
 	public static void main(String args[]){
+		
+		// Get all filenames from the user
+		getUserInput();
+		
 		
 		// Create the metrics values
 		MetricBin inputMetrics = new MetricBin();
@@ -38,63 +51,67 @@ public class Main {
 		
 		// Attempt to read in the metrics file
 		try {
-			if(!inputMetrics.parseMetrics(metricsFilename)){
-				System.out.print("ERROR: Main::main(): could not parse metrics file \"" + metricsFilename + "\"\n\n");
+			if(!inputMetrics.parseMetrics(m_userSys1MetricsFilename)){
+				System.out.print("ERROR: Main::main(): could not parse metrics file \"" + m_userSys1MetricsFilename + "\"\n\n");
 				return;
 			}
 		} catch (IOException e) {
-			System.out.print("Error, could not find file \"" + metricsFilename + "\"\n\n");
-			e.printStackTrace();
-			return;
-		}
-		
-		// Attempt to read the metrics file for the cross validation step
-		try {
-			if(!sys2Metrics.parseMetrics(crossValidationMetricsFilename)){
-				System.out.print("ERROR: Main::main(): could not parse metrics file \"" + crossValidationMetricsFilename + "\"\n\n");
-				return;
-			}
-		} catch (IOException e) {
-			System.out.print("Error, could not find file \"" + crossValidationMetricsFilename + "\"\n\n");
-			e.printStackTrace();
-			return;
-		}
-		
-		// Attempt to read in the thresholds file
-		try {
-			if(!MetricNode.parseThresholds(thresholdsFilename)){
-				System.out.print("ERROR: Main::main(): could not parse thresholds file \"" + thresholdsFilename + "\"\n\n");
-				return;
-			}
-		} catch (IOException e) {
-			System.out.print("Error, could not find file \"" + thresholdsFilename + "\"\n\n");
+			System.out.print("Error, could not find file \"" + m_userSys1MetricsFilename + "\"\n\n");
 			e.printStackTrace();
 			return;
 		}
 		
 		// Attempt to read in the base of example file
 		try{
-			if(!inputSummary.parseSummary(summaryFilename)){
-				System.out.print("ERROR: Main::main(): could not parse summary file \"" + summaryFilename + "\"\n\n");
+			if(!inputSummary.parseSummary(m_userSys1SummaryFilename)){
+				System.out.print("ERROR: Main::main(): could not parse summary file \"" + m_userSys1SummaryFilename + "\"\n\n");
 				return;
 			}
 		} catch (IOException e){
-			System.out.print("Error, could not find file \"" + summaryFilename + "\"\n\n");
+			System.out.print("Error, could not find file \"" + m_userSys1SummaryFilename + "\"\n\n");
 			e.printStackTrace();
 			return;
 		}
 		
-		// Attempt to read in the base of example file for system 2
-		try{
-			if(!sys2Summary.parseSummary(crossValidationSummaryFilename)){
-				System.out.print("ERROR: Main::main(): could not parse summary file \"" + crossValidationSummaryFilename + "\"\n\n");
+		// Attempt to read in the thresholds file
+		try {
+			if(!MetricNode.parseThresholds(m_userThresholdsFilename)){
+				System.out.print("ERROR: Main::main(): could not parse thresholds file \"" + m_userThresholdsFilename + "\"\n\n");
 				return;
 			}
-		} catch (IOException e){
-			System.out.print("Error, could not find file \"" + crossValidationSummaryFilename + "\"\n\n");
+		} catch (IOException e) {
+			System.out.print("Error, could not find file \"" + m_userThresholdsFilename + "\"\n\n");
 			e.printStackTrace();
 			return;
 		}
+		
+		// If they want to do a cross validaiton, load those files too
+		if(m_userSys2MetricsFilename.length() > 0){
+			// Attempt to read the metrics file for the cross validation step
+			try {
+				if(!sys2Metrics.parseMetrics(m_userSys2MetricsFilename)){
+					System.out.print("ERROR: Main::main(): could not parse metrics file \"" + m_userSys2MetricsFilename + "\"\n\n");
+					return;
+				}
+			} catch (IOException e) {
+				System.out.print("Error, could not find file \"" + m_userSys2MetricsFilename + "\"\n\n");
+				e.printStackTrace();
+				return;
+			}
+			
+			// Attempt to read in the base of example file for system 2
+			try{
+				if(!sys2Summary.parseSummary(m_userSys2SummaryFilename)){
+					System.out.print("ERROR: Main::main(): could not parse summary file \"" + m_userSys2SummaryFilename + "\"\n\n");
+					return;
+				}
+			} catch (IOException e){
+				System.out.print("Error, could not find file \"" + m_userSys2SummaryFilename + "\"\n\n");
+				e.printStackTrace();
+				return;
+			}
+		}
+
 		
 		// Generate the temporary variables
 		RuleSet testRules = new RuleSet();
@@ -107,15 +124,9 @@ public class Main {
 		// it. If it's better than the best, save it.
 		for(int i = 0; i < 1000; i++){
 			testRules.generate(4, .5, 5);
-//			System.out.print("Testing rules: \n"+testRules.toString()+"\n");
 			SummaryBin newSummary = eval.executeRuleSet(testRules,  inputMetrics);
 			
-//System.out.print("Writing new summary\n");
-//System.out.print(newSummary.toString()+"\n");
-			
-			
 			double fitness = eval.fitness(inputSummary,  newSummary);
-//			System.out.print("Fitness = "+String.valueOf(fitness)+"\n\n");
 			
 			if(fitness > bestFitness){
 				bestFitness = fitness;
@@ -124,9 +135,7 @@ public class Main {
 			}
 		}
 		
-//		double crossVal = eval.crossValidation(inputSummary, bestSummary, bestRuleSet, inputMetrics);
 		Evaluator.DataBundle crossValResults = new Evaluator.DataBundle();
-//		crossValResults = eval.crossValidation(bestSummary, bestRuleSet, crossValMetrics);
 		crossValResults = eval.crossValidation(bestRuleSet, sys2Summary, sys2Metrics);
 		
 		System.out.print("\n\n     ***** SOLUTION *****     \n");
@@ -140,4 +149,195 @@ public class Main {
 		System.out.print("Cross Validation Recall: " + crossValResults.recall + "\n");
 		System.out.print("Cross Validation Overall Fitness: " + crossValResults.fitness + "\n\n\n");
 	}
+	
+	private static void getUserInput(){
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String input = new String();
+		boolean goodData = false;
+
+		System.out.print("    *** Summary RuleSet Generator *** \n\n");
+		System.out.print("Type 'help' for help or 'exit' to exit at any time.\n\n");
+		
+		// Get the metrics file for system 1
+		while(!goodData){
+			System.out.print("Enter name of file containing system one metrics: ");
+			try {
+				input = reader.readLine();
+			} catch (IOException e) {
+				System.out.println("Error!");
+			}
+			if(input.toLowerCase().equals("help")){
+				System.out.print("The metrics file should contain all classes and methods in the system in the following format:\n");
+				System.out.print("Class Class1 1 2 3 4 5 6\n");
+				System.out.print("Class Class2 1 2 3 4 5 6\n");
+				System.out.print("Method Method1 1 2 3 4 5 6\n");
+				System.out.print("Method Method2 1 2 3 4 5 6\n");
+				System.out.print("Class Class3 1 2 3 4 5 6\n");
+				System.out.print("Where each value corresponds to the six metrics used for evaluation in their respective order:\n");
+				System.out.print("DIT\n");
+				System.out.print("LOCCLASS\n");
+				System.out.print("LOCMETHOD\n");
+				System.out.print("NMD\n");
+				System.out.print("NACC\n");
+				System.out.print("CBO\n");
+			}else if(input.toLowerCase().equals("exit")){
+				System.exit(4);
+			}else{
+				m_userSys1MetricsFilename = input;
+				goodData = true;
+			}
+		}
+		
+		// Get the summary for system 1
+		goodData = false;
+		while(!goodData){
+			System.out.print("Enter name of file containing system one base of example summary: ");
+			try {
+				input = reader.readLine();
+			} catch (IOException e) {
+				System.out.println("Error!");
+			}
+			if(input.toLowerCase().equals("help")){
+				System.out.print("The summary should contain a list of classes and methods that accurately describe the system\n");
+				System.out.print("The format should be:\n");
+				System.out.print("Class Class1\n");
+				System.out.print("Class Class2\n");
+				System.out.print("Method Method1\n");
+				System.out.print("Method Method2\n");
+				System.out.print("Class Class3\n");
+			}else if(input.toLowerCase().equals("exit")){
+				System.exit(5);
+			}else{
+				m_userSys1SummaryFilename = input;
+				goodData = true;
+			}
+		}
+		
+		// Get the thresholds that will be used 
+		goodData = false;
+		while(!goodData){
+			System.out.print("Enter name of file containing metric thresholds: ");
+			try {
+				input = reader.readLine();
+			} catch (IOException e) {
+				System.out.println("Error!");
+			}
+			if(input.toLowerCase().equals("help")){
+				System.out.print("The thresholds file should contain a list of all metric types and their associated min and max values\n");
+				System.out.print("The format should be:\n");
+				System.out.print("DIT 5 50\n");
+				System.out.print("LOCCLASS 1 30\n");
+				System.out.print("LOCMETHOD 0 100\n");
+				System.out.print("NMD 0 650\n");
+				System.out.print("NACC 300 350\n");
+				System.out.print("CBO 100 200\n");
+			}else if(input.toLowerCase().equals("exit")){
+				System.exit(6);
+			}else{
+				m_userThresholdsFilename = input;
+				goodData = true;
+			}
+		}
+		
+		// Prompt the user for Cross Validation
+		goodData = false;
+		while(!goodData){
+			System.out.print("Perform a Cross Validation (Y/N): ");
+			try {
+				input = reader.readLine();
+			} catch (IOException e) {
+				System.out.println("Error!");
+			}
+			if(input.toLowerCase().equals("help")){
+				System.out.print("Performing a cross validation will help ensure the accuracy of your generated ruleset\n");
+				System.out.print("Will require an additional metrics file and summary file for a second system");
+			}else if(input.toLowerCase().equals("exit")){
+				System.exit(7);
+			}else if(input.toLowerCase().equals("y")){
+				goodData = true;
+			}else if(input.toLowerCase().equals("n")){
+				return;
+			}else{
+				System.out.print("Error, could not interpret '" + input + "'\n");
+			}
+		}
+		
+		// Get the metrics file for system 1
+		while(!goodData){
+			System.out.print("Enter name of file containing system two metrics: ");
+			try {
+				input = reader.readLine();
+			} catch (IOException e) {
+				System.out.println("Error!");
+			}
+			if(input.toLowerCase().equals("help")){
+				System.out.print("The metrics file should contain all classes and methods in the system in the following format:\n");
+				System.out.print("Class Class1 1 2 3 4 5 6\n");
+				System.out.print("Class Class2 1 2 3 4 5 6\n");
+				System.out.print("Method Method1 1 2 3 4 5 6\n");
+				System.out.print("Method Method2 1 2 3 4 5 6\n");
+				System.out.print("Class Class3 1 2 3 4 5 6\n");
+				System.out.print("Where each value corresponds to the six metrics used for evaluation in their respective order:\n");
+				System.out.print("DIT\n");
+				System.out.print("LOCCLASS\n");
+				System.out.print("LOCMETHOD\n");
+				System.out.print("NMD\n");
+				System.out.print("NACC\n");
+				System.out.print("CBO\n");
+			}else if(input.toLowerCase().equals("exit")){
+				System.exit(8);
+			}else{
+				m_userSys2MetricsFilename = input;
+				goodData = true;
+			}
+		}
+		
+		// Get the summary for system 2
+		goodData = false;
+		while(!goodData){
+			System.out.print("Enter name of file containing system two base of example summary: ");
+			try {
+				input = reader.readLine();
+			} catch (IOException e) {
+				System.out.println("Error!");
+			}
+			if(input.toLowerCase() == "help"){
+				System.out.print("The summary should contain a list of classes and methods that accurately describe the system\n");
+				System.out.print("The format should be:\n");
+				System.out.print("Class Class1\n");
+				System.out.print("Class Class2\n");
+				System.out.print("Method Method1\n");
+				System.out.print("Method Method2\n");
+				System.out.print("Class Class3\n");
+			}else if(input.toLowerCase() == "exit"){
+				System.exit(9);
+			}else{
+				m_userSys2SummaryFilename = input;
+				goodData = true;
+			}
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
