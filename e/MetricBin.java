@@ -4,12 +4,32 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
 
-
+/**
+ * Data Container class used to hold a set of classes and methods and their corresponding metric values.
+ * Also contains the functionality to parse a file to extract this information. The file must be in the 
+ * format:
+ * <br><br>
+ * Class Class1 1 2 3 4 5 6
+ * Method Method1 5 5 6 6 7 7
+ * Class Class2 0 0 0 1 6 7
+ * Class Class3 9 8 7 6 8 7 
+ * Method Method2 0 6 0 7 0 8
+ * <br><br>
+ * Where each of the values following the name of the class/method correspond to the DIT, LOCCLASS, LOCMETHOD,
+ * NMD, NACC, and CBO in that order
+ * 
+ * @author etnc6d
+ *
+ */
 public class MetricBin {
 	public Vector<String> names;
 	public Vector<Boolean> classes;
 	public Vector<Integer[]> metricValues;
 	
+	/**
+	 * Default Constructor - declares all vectors empty
+	 * 
+	 */
 	public MetricBin(){
 		names = new Vector<String>();
 		classes = new Vector<Boolean>();
@@ -21,6 +41,15 @@ public class MetricBin {
 	
 	// Takes in in the format
 	// Class/Method Name m1 m2 m3 m4 m5
+	/**
+	 * Parses a file to extract the information and uses that for self-population
+	 * @param filename
+	 * 	The name of the file that wil be parsed
+	 * @return
+	 * 	True upon successful parsing, false otherwise
+	 * @throws IOException
+	 * 	Throws an IOException in the event that the file does not exist
+	 */
 	public boolean parseMetrics(String filename) throws IOException{
 		
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -41,8 +70,6 @@ public class MetricBin {
 			// Determine if class or method
 			if(tokens[0].toLowerCase().equals("class")){
 				classes.add(true);
-// TODO remove below
-//System.out.print("Adding a class metric\n\n");
 			}else{
 				classes.add(false);
 			}
@@ -52,15 +79,12 @@ public class MetricBin {
 			
 			// Create and populate the array
 			Integer[] vals = new Integer[6];
-//			metricValues.add(vals);
 			
 			for(int i = 0; i < 6; i++){
 				vals[i] = Integer.parseInt(tokens[i+2]);
 			}
-			
 			metricValues.add(vals);
 		}
-		
 		return true;
 	}
 }

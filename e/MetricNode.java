@@ -1,22 +1,28 @@
 package edu.mst.cs206.e;
 
-// DONE.
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Random;
 
+//TODO Someday, if I have time, I'd like to make two more classes, leafNode and NonLeafNode that inherit from 
+// this class so that each node doesn't have extra attributes that aren't needed.
+
 /**\
+ * A recursive node that is used to model a single rule as a tree structure
+ * <br><br>
+ * (A AND B) is represented as:<br>
+ *     AND<br>
+ *    /	  \<br>
+ *   A     B<br><br>
+ *   
+ * Each rule stores information about whether or not it is a leaf as well as all values it would need regardless.
+ * Any node is, at any given moment, either a leaf or a non-leaf, though it has all the attributes to be either
  * 
  * @author etnc6d
- * 
- * Class : MetricNode
  *
  */
 public class MetricNode {
-	
-	// TODO Implement some static integers for 0 => 'DIT' mapping
 	
 	// A random number generator that all MetricNode objects
 	//  have access to. This value is used for all randomization
@@ -126,6 +132,13 @@ public class MetricNode {
 		
 	}
 	
+	
+	/**
+	 * Expands the calling node. Based on the complexity, the node may or may not have children, if the node has 
+	 * children then this function recurses onto them. Otherwise, the nodes data values are set based on the min
+	 * and max threshold values contained by the MetricNode class. These min and max values must be set before
+	 * calling this function
+	 */
 	public void grow(){
 		double complexityCap = generator.nextDouble();
 		
@@ -152,6 +165,15 @@ public class MetricNode {
 	}
 		
 	// this should be run BEFORE any MetricNode objects are ever created!!
+	/**
+	 * Gets the min and max threshold values from a file that is parsed
+	 * @param filename
+	 * 	The name of the file that will be parsed
+	 * @return
+	 * 	Returns true if the file was successfully parsed, false otherwise
+	 * @throws IOException
+	 * 	Throws an IOException when the specified file can not be found
+	 */
 	public static boolean parseThresholds(String filename) throws IOException{
 		
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -220,6 +242,13 @@ public class MetricNode {
 		return true;
 	}
 	
+	
+	/**
+	 * Builds a string with the values of the min and max for each metric type for output to the console. This is to 
+	 * be used for debugging purposes only
+	 * @return
+	 * 	A string containing the name of each metric type and the min and max values for that metric respectively
+	 */
 	public static String outputThresholds(){
 		if(thresholdMin == null){
 			return "THRESHOLDS NOT LOADED\n\n";
@@ -251,7 +280,11 @@ public class MetricNode {
 		}
 	}
 	
-	
+	/**
+	 * Transforms the contents of the MetricNode into a string for output.
+	 * @return
+	 * 	Returns a string representing the rule
+	 */
 	public String toString(){
 		/*
 		 *        A
@@ -263,9 +296,6 @@ public class MetricNode {
 		String toReturn = new String();
 		
 		if(isLeaf){
-	//		String r = new String();
-//			toReturn = "m";
-//			toReturn += Integer.toString(metricValue);
 			toReturn += metricName(metricValue);
 			if(greaterThan){
 				toReturn += " > ";
@@ -273,8 +303,6 @@ public class MetricNode {
 				toReturn += " < ";
 			}
 			toReturn += Integer.toString(threshold);
-
-//				return r;
 		}else{
 			toReturn += "(";
 			toReturn += l.toString();
@@ -286,10 +314,7 @@ public class MetricNode {
 			toReturn += r.toString();
 			toReturn += ")";
 		}
-		
 		return toReturn;
-	
-//		return "cat";
 	}
 }
 

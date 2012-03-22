@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.util.Vector;
 
 /**
- * Data container class
+ * Data container class for the summary that will either be read in or generated
+ * 
  * @author etnc6d
  *
  */
@@ -13,11 +14,26 @@ public class SummaryBin {
 	public Vector<String> name;
 	public Vector<Boolean> isClass;
 	
+	
+	/**
+	 * Default Constructor - Initializes all arrays to empty
+	 */
 	public SummaryBin(){
 		name = new Vector<String>();
 		isClass = new Vector<Boolean>();
 	}
 	
+	
+	/**
+	 * Parses a file to self-populate its data elements
+	 * 
+	 * @param filename
+	 * 	The name of the file that will be parsed
+	 * @return
+	 * 	True if the file was successfully parsed, false otherwise
+	 * @throws IOException
+	 * 	Throws IOException if the file cannot be found
+	 */
 	public boolean parseSummary(String filename) throws IOException{
 		
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -41,10 +57,14 @@ public class SummaryBin {
 			
 			name.add(tokens[1]);
 		}
-		
 		return true;
 	}
 	
+	/**
+	 * Converts a Summary into a string for output
+	 * @return
+	 * 	A string representing the contents of the summary
+	 */
 	public String toString(){
 		String toReturn = new String();
 		

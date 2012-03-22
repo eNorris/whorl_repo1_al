@@ -1,8 +1,16 @@
 package edu.mst.cs206.e;
 import java.io.IOException;
 
+//FIXME Allow the user to enter the filenames
+//FIXME Correct author names, Edward didn't do everything!
 
 
+/**
+ * The main class that launches the program. Contians only the main() function
+ * 
+ * @author etnc6d
+ *
+ */
 public class Main {
 	
 	private static String metricsFilename = "C:\\temp\\metrics.txt";
@@ -10,6 +18,12 @@ public class Main {
 	private static String summaryFilename = "C:\\temp\\summary1.txt";
 	private static String crossValidationFilename = "C:\\temp\\crossVal.txt";
 	
+	/**
+	 * The main function that runs the program
+	 * 
+	 * @param args
+	 * 	The arguments recieved from a command line. Any sent are ignored
+	 */
 	public static void main(String args[]){
 		
 		// Create the metrics values
