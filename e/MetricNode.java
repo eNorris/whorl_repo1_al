@@ -30,12 +30,12 @@ public class MetricNode {
 	public static Random generator = null;
 	
 	// Value of the metric if the metric is a leaf
-	//  0 => DIT        - Depth of Inheritance Tree
-	//  1 => LOCCLASS   - Lines of Code in Class
-	//  2 => LOCMETHOD  - Lines of Code in Method
-	//  3 => NMD        - Number of Methods in Class
-	//  4 => NACC       - Number of accessor functions
-	//  5 => CBO        - Coupling Value
+	//  0 => DIT       - Depth of Inheritance Tree
+	//  1 => NM   	- Number of Methods
+	//  2 => MLC  	- Method Lines of Code
+	//  3 => NA		- Number of Attributes
+	//  4 => NC		- Number of Children
+	//  5 => NP		- Number of Parameters
 	public int metricValue;
 	
 	// distinguishes between leaf nodes and non-leaf nodes
@@ -164,9 +164,10 @@ public class MetricNode {
 		}
 	}
 		
-	// this should be run BEFORE any MetricNode objects are ever created!!
+
 	/**
-	 * Gets the min and max threshold values from a file that is parsed
+	 * Gets the min and max threshold values from a file that is parsed.<br>
+	 * <b> THIS METHOD SHOULD BE RUN BEFORE ANY METRIC NODES ARE CREATED </b>
 	 * @param filename
 	 * 	The name of the file that will be parsed
 	 * @return
@@ -204,36 +205,34 @@ public class MetricNode {
 				thresholdMin[0] = Integer.parseInt(tokens[1]);
 				thresholdMax[0] = Integer.parseInt(tokens[2]);
 				found[0] = true;
-			}else if (tokens[0].equals("LOCCLASS")){
+			}else if (tokens[0].equals("NM")){
 				thresholdMin[1] = Integer.parseInt(tokens[1]);
 				thresholdMax[1] = Integer.parseInt(tokens[2]);
 				found[1] = true;
-			}else if (tokens[0].equals("LOCMETHOD")){
+			}else if (tokens[0].equals("MLC")){
 				thresholdMin[2] = Integer.parseInt(tokens[1]);
 				thresholdMax[2] = Integer.parseInt(tokens[2]);
 				found[2] = true;
-			}else if (tokens[0].equals("NMD")){
+			}else if (tokens[0].equals("NA")){
 				thresholdMin[3] = Integer.parseInt(tokens[1]);
 				thresholdMax[3] = Integer.parseInt(tokens[2]);
 				found[3] = true;
-			}else if (tokens[0].equals("NACC")){
+			}else if (tokens[0].equals("NC")){
 				thresholdMin[4] = Integer.parseInt(tokens[1]);
 				thresholdMax[4] = Integer.parseInt(tokens[2]);
 				found[4] = true;
-			}else if (tokens[0].equals("CBO")){
+			}else if (tokens[0].equals("NP")){
 				thresholdMin[5] = Integer.parseInt(tokens[1]);
 				thresholdMax[5] = Integer.parseInt(tokens[2]);
 				found[5] = true;
 			}else{
 				System.out.print("ERROR: MetricNode::parseThresholds(): Could not interpret \""+tokens[0]+"\"\n\n");
-//				return false;
 			}
 		}
 		
 		for(int i = 0; i < found.length; i++){
 			if(!found[i]){
 				System.out.print("ERROR: MetricNode::parseThrehsolds(): Did not get a "+metricName(i)+" threshold\n\n");
-//				return false;
 			}
 		}
 		
@@ -266,15 +265,15 @@ public class MetricNode {
 		if(metricVal == 0){
 			return "DIT";
 		}else if (metricVal == 1){
-			return "LOCCLASS";
+			return "NM";
 		}else if (metricVal == 2){
-			return "LOCMETHOD";
+			return "MLC";
 		}else if (metricVal == 3){
-			return "NMD";
+			return "NA";
 		}else if (metricVal == 4){
-			return "NACC";
+			return "NC";
 		}else if (metricVal == 5){
-			return "CBO";
+			return "NP";
 		}else{
 			return "ERROR";
 		}

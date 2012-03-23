@@ -9,15 +9,13 @@ import java.util.Vector;
  * Also contains the functionality to parse a file to extract this information. The file must be in the 
  * format:
  * <br><br>
- * Class Class1 1 2 3 4 5 6
- * Method Method1 5 5 6 6 7 7
- * Class Class2 0 0 0 1 6 7
- * Class Class3 9 8 7 6 8 7 
- * Method Method2 0 6 0 7 0 8
+ * Class Class1 1 2 3 4 5 6 <br>
+ * Method Method1 5 5 6 6 7 7 <br>
+ * Class Class2 0 0 0 1 6 7 <br>
+ * Class Class3 9 8 7 6 8 7 <br>
+ * Method Method2 0 6 0 7 0 8<br>
  * <br><br>
- * Where each of the values following the name of the class/method correspond to the DIT, LOCCLASS, LOCMETHOD,
- * NMD, NACC, and CBO in that order
- * 
+ * Where each of the values following the name of the class/method correspond to the DIT, NM, MLC, NA, NC, and NP
  * @author Eric Noles, Edward Norris
  *
  */
@@ -36,11 +34,6 @@ public class MetricBin {
 		metricValues = new Vector<Integer[]>();
 	}
 	
-	
-	
-	
-	// Takes in in the format
-	// Class/Method Name m1 m2 m3 m4 m5
 	/**
 	 * Parses a file to extract the information and uses that for self-population
 	 * @param filename
@@ -52,6 +45,12 @@ public class MetricBin {
 	 */
 	public boolean parseMetrics(String filename) throws IOException{
 		
+		// Thomas - Right here, filename is the name of the XML file that the Metrics Plugin produces.
+		// You need to parse this file with your function and send that output to some intermediate file,
+		// say "./parsedMetrics.txt", then, just pass that filename to reader below.
+		//
+		//                  Replace this variable with your filename |
+		//                                                           V
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 		
 		String line = null;

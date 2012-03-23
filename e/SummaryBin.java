@@ -45,6 +45,8 @@ public class SummaryBin {
 			String[] tokens = line.split(" ");
 			
 			if(tokens.length != 2){
+				// Look for two values, the first should be "Class" or "Method", the second will be the name
+				// of the respective object
 				System.out.print("ERROR: SummaryBin::parseSummary(): did not get 2 tokens\n\n");
 				return false;
 			}

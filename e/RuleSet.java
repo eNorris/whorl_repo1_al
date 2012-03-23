@@ -1,7 +1,6 @@
 package edu.mst.cs206.e;
 import java.util.Vector;
 
-//FIXME - On AccessAt - if not needed, just get rid of it, otherwise handle the case of illegal index
 /**
  * Class containing a set of rules (ie MetricNodes) and data that will be used to generated more rules
  * according to certain complexity and size constraints

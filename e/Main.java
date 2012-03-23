@@ -3,9 +3,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-//FIXME Allow the user to enter the filenames
-//TODO Add logging
-
 
 /**
  * The main class that launches the program. Contians only the main() function
@@ -14,14 +11,6 @@ import java.io.InputStreamReader;
  *
  */
 public class Main {
-
-/*
-	private static String metricsFilename = "C:\\temp\\metrics.txt";
-	private static String thresholdsFilename = "C:\\temp\\thresholds.txt";
-	private static String summaryFilename = "C:\\temp\\summary1.txt";
-	private static String crossValidationSummaryFilename = "C:\\temp\\sys2Sum.txt";
-	private static String crossValidationMetricsFilename = "C:\\temp\\sys2Metrics.txt";
-*/
 	
 	private static String m_userSys1MetricsFilename = new String();
 	private static String m_userSys2MetricsFilename = new String();
@@ -136,7 +125,9 @@ public class Main {
 		}
 		
 		Evaluator.DataBundle crossValResults = new Evaluator.DataBundle();
-		crossValResults = eval.crossValidation(bestRuleSet, sys2Summary, sys2Metrics);
+		if(m_userSys2MetricsFilename.length() > 0){
+			crossValResults = eval.crossValidation(bestRuleSet, sys2Summary, sys2Metrics);
+		}
 		
 		System.out.print("\n\n     ***** SOLUTION *****     \n");
 		System.out.print("\nBest RuleSet: \n"+bestRuleSet.toString()+"\n");
@@ -144,10 +135,12 @@ public class Main {
 		System.out.print("Base of Example: \n" + inputSummary.toString()+"\n");
 		System.out.print("Generated Summary: \n" + bestSummary + "\n\n");
 		
-		System.out.print("Cross Validation Summary: \n" + crossValResults.crossValSummary.toString() + "\n");
-		System.out.print("Cross Validation Precision: " + crossValResults.precision + "\n");
-		System.out.print("Cross Validation Recall: " + crossValResults.recall + "\n");
-		System.out.print("Cross Validation Overall Fitness: " + crossValResults.fitness + "\n\n\n");
+		if(m_userSys2MetricsFilename.length() > 0){
+			System.out.print("Cross Validation Summary: \n" + crossValResults.crossValSummary.toString() + "\n");
+			System.out.print("Cross Validation Precision: " + crossValResults.precision + "\n");
+			System.out.print("Cross Validation Recall: " + crossValResults.recall + "\n");
+			System.out.print("Cross Validation Overall Fitness: " + crossValResults.fitness + "\n\n\n");
+		}
 	}
 	
 	private static void getUserInput(){
@@ -156,7 +149,7 @@ public class Main {
 		String input = new String();
 		boolean goodData = false;
 
-		System.out.print("    *** Summary RuleSet Generator *** \n\n");
+		System.out.print("\n\n    *** Summary RuleSet Generator *** \n\n");
 		System.out.print("Type 'help' for help or 'exit' to exit at any time.\n\n");
 		
 		// Get the metrics file for system 1
@@ -175,12 +168,12 @@ public class Main {
 				System.out.print("Method Method2 1 2 3 4 5 6\n");
 				System.out.print("Class Class3 1 2 3 4 5 6\n");
 				System.out.print("Where each value corresponds to the six metrics used for evaluation in their respective order:\n");
-				System.out.print("DIT\n");
-				System.out.print("LOCCLASS\n");
-				System.out.print("LOCMETHOD\n");
-				System.out.print("NMD\n");
-				System.out.print("NACC\n");
-				System.out.print("CBO\n");
+				System.out.print("Depth of Inheritance Tree (DIT)\n");
+				System.out.print("Number of Methods (NM)\n");
+				System.out.print("Method Lines of Code (MLC)\n");
+				System.out.print("Number of Attributes (NA)\n");
+				System.out.print("Number of Children (NC)\n");
+				System.out.print("Number of Parameters (NP)\n");
 			}else if(input.toLowerCase().equals("exit")){
 				System.exit(4);
 			}else{
@@ -227,11 +220,11 @@ public class Main {
 				System.out.print("The thresholds file should contain a list of all metric types and their associated min and max values\n");
 				System.out.print("The format should be:\n");
 				System.out.print("DIT 5 50\n");
-				System.out.print("LOCCLASS 1 30\n");
-				System.out.print("LOCMETHOD 0 100\n");
-				System.out.print("NMD 0 650\n");
-				System.out.print("NACC 300 350\n");
-				System.out.print("CBO 100 200\n");
+				System.out.print("NM 1 30\n");
+				System.out.print("MLC 0 100\n");
+				System.out.print("NA 0 650\n");
+				System.out.print("NC 300 350\n");
+				System.out.print("NP 100 200\n");
 			}else if(input.toLowerCase().equals("exit")){
 				System.exit(6);
 			}else{
@@ -279,12 +272,12 @@ public class Main {
 				System.out.print("Method Method2 1 2 3 4 5 6\n");
 				System.out.print("Class Class3 1 2 3 4 5 6\n");
 				System.out.print("Where each value corresponds to the six metrics used for evaluation in their respective order:\n");
-				System.out.print("DIT\n");
-				System.out.print("LOCCLASS\n");
-				System.out.print("LOCMETHOD\n");
-				System.out.print("NMD\n");
-				System.out.print("NACC\n");
-				System.out.print("CBO\n");
+				System.out.print("Depth of Inheritance Tree (DIT)\n");
+				System.out.print("Number of Methods (NM)\n");
+				System.out.print("Method Lines of Code (MLC)\n");
+				System.out.print("Number of Attributes (NA)\n");
+				System.out.print("Number of Children (NC)\n");
+				System.out.print("Number of Parameters (NP)\n");
 			}else if(input.toLowerCase().equals("exit")){
 				System.exit(8);
 			}else{

@@ -61,23 +61,6 @@ public class Evaluator {
 	 */
 	public double fitness(SummaryBin summary1, SummaryBin summary2){
 		return ((precision(summary1, summary2)+recall(summary1, summary2)) / 2.0);
-/*
-		double numerator=0;
-		double fit;
-		// For every element in the first summary, cross reference it with every element in
-		// the second summary. Count the matches
-		for(int i=0; i < summary1.name.size(); i++){
-			for(int j=0; j < summary2.name.size(); j++){
-				if(summary1.name.elementAt(i).equals(summary2.name.elementAt(j)) 
-						&& summary1.isClass.elementAt(i).equals(summary2.isClass.elementAt(j))){
-					numerator++;
-				}
-			}
-		}
-		// The fitness is the matches over the averate size of the two summaries
-		fit = ((numerator/summary1.name.size())+(numerator/summary2.name.size()))/2;
-		return fit;
-*/
 	}
 	
 	
@@ -237,7 +220,6 @@ public class Evaluator {
 	 * 	A DataBundle that contains the precision, recall, fitness and summary generated
 	 */
     public DataBundle crossValidation(RuleSet sys1RuleSet, SummaryBin sys2Summary, MetricBin sys2Metrics){
-//   		SummaryBin sys1Summary, RuleSet sys1Rules, MetricBin sys2Metrics){
     	
     	DataBundle toReturn = new DataBundle();
     	
@@ -253,65 +235,5 @@ public class Evaluator {
     	toReturn.crossValSummary = sys2NewSummary;
     	
     	return toReturn;
-//    	double fit1, fit2;
-    	
-//    	MetricBin genMetrics = new MetricBin();
-//		genMetrics.parseThresholds("Filename2.txt");
-    	/*try{
-    		genMetrics.parseMetrics("filename.txt");
-    	}
-		genMetrics.parseMetrics("filename.txt");*/
-		
-		
-/*
-		try {
-			if(!genMetrics.parseMetrics("filename.txt")){
-				System.out.print("ERROR: Main::main(): could not parse metrics file");
-			}
-		} catch (IOException e) {
-			System.out.print("Error, could not find file");
-			e.printStackTrace();
-		}
-*/
-/*		
-		Evaluator eval = new Evaluator();
-		
-		// baseSummary is a summary generated with metrics from system2, and the rules used to generate the
-    	// 		summary of system 2
-    	SummaryBin baseSummary2 = eval.executeRuleSet(rules,baseMetrics); 
-    	
-    	//the fitness function for the comparison between the base of examples and the generated summary for sys1
-    	fit1 = eval.fitness(baseSummary, baseSummary2); 
-    	
-    	//now we need to generate the best rules for generating the base of examples summary
-    	RuleSet testRules = new RuleSet();
-		double bestFitness = 0.0;
-		RuleSet bestRuleSet = null;
-    	
-		// code from main that generated the best rules for genSummary. Instead we generate best rules for
-		// 		our base of examples summary, using the genSummary as our new base of examples
-    	for(int i = 0; i < 1000; i++){
-			testRules.generate(5, 0.5, 5);
-			SummaryBin newSummary = eval.executeRuleSet(testRules,  genMetrics);
-			double fitness = eval.fitness(genSummary,  newSummary);
-			
-			if(fitness > bestFitness){
-				bestFitness = fitness;
-				bestRuleSet = testRules;
-			}
-		}
-    	
-    	// generates a new summary of the generated summary, using the best rules for generating a summary
-    	// 		of system 1, also known as the base of examples system
-    	SummaryBin genSummary2 = eval.executeRuleSet(bestRuleSet, genMetrics);
-    	
-    	// uses the fitness function to compare our origional generated summary, and the summary generated 
-    	// 		for system2 
-    	fit2 = eval.fitness(genSummary, genSummary2);
-    	
-    	double avgFit = (fit1 + fit2) / 2;
-    	
-    	return avgFit;
-*/
     }
 }
