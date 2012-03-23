@@ -12,7 +12,7 @@ import java.util.Vector;
  */
 public class SummaryBin {
 	public Vector<String> name;
-	public Vector<Boolean> isClass;
+//	public Vector<Boolean> isClass;
 	
 	
 	/**
@@ -20,7 +20,7 @@ public class SummaryBin {
 	 */
 	public SummaryBin(){
 		name = new Vector<String>();
-		isClass = new Vector<Boolean>();
+//		isClass = new Vector<Boolean>();
 	}
 	
 	
@@ -44,20 +44,21 @@ public class SummaryBin {
 			
 			String[] tokens = line.split(" ");
 			
-			if(tokens.length != 2){
+			if(tokens.length != 1){
 				// Look for two values, the first should be "Class" or "Method", the second will be the name
 				// of the respective object
-				System.out.print("ERROR: SummaryBin::parseSummary(): did not get 2 tokens\n\n");
+				System.out.print("ERROR: SummaryBin::parseSummary(): did not get 1 tokens\n\n");
 				return false;
 			}
 			
-			if(tokens[0].equals("Class")){
-				isClass.add(true);
-			}else{
-				isClass.add(false);
-			}
+			// Depricated Code
+//			if(tokens[0].equals("Class")){
+//				isClass.add(true);
+//			}else{
+//				isClass.add(false);
+//			}
 			
-			name.add(tokens[1]);
+			name.add(tokens[0]);
 		}
 		return true;
 	}
@@ -71,11 +72,12 @@ public class SummaryBin {
 		String toReturn = new String();
 		
 		for(int i = 0; i < name.size(); i++){
-			if(isClass.elementAt(i)){
-				toReturn += "Class ";
-			}else{
-				toReturn += "Method ";
-			}
+			// Depricated Code
+//			if(isClass.elementAt(i)){
+//				toReturn += "Class ";
+//			}else{
+//				toReturn += "Method ";
+//			}
 			toReturn += (name.elementAt(i) + "\n");
 		}
 		

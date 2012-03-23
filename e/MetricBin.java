@@ -1,8 +1,15 @@
 package edu.mst.cs206.e;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
+import edu.mst.cs206.MetricsParser.MetricsXMLParser;
 
 /**
  * Data Container class used to hold a set of classes and methods and their corresponding metric values.
@@ -21,7 +28,7 @@ import java.util.Vector;
  */
 public class MetricBin {
 	public Vector<String> names;
-	public Vector<Boolean> classes;
+//	public Vector<Boolean> classes;
 	public Vector<Integer[]> metricValues;
 	
 	/**
@@ -30,7 +37,7 @@ public class MetricBin {
 	 */
 	public MetricBin(){
 		names = new Vector<String>();
-		classes = new Vector<Boolean>();
+//		classes = new Vector<Boolean>();
 		metricValues = new Vector<Integer[]>();
 	}
 	
@@ -45,13 +52,17 @@ public class MetricBin {
 	 */
 	public boolean parseMetrics(String filename) throws IOException{
 		
-		// Thomas - Right here, filename is the name of the XML file that the Metrics Plugin produces.
-		// You need to parse this file with your function and send that output to some intermediate file,
-		// say "./parsedMetrics.txt", then, just pass that filename to reader below.
-		//
-		//                  Replace this variable with your filename |
-		//                                                           V
-		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		// Convert the XML to the proper format
+		String newFile = "./finalMetrics.txt";
+		try {
+			MetricsXMLParser.generateMetricFiles(filename).printToFile(new File(newFile));
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		}
+		
+		BufferedReader reader = new BufferedReader(new FileReader(newFile));
 		
 		String line = null;
 		
@@ -61,26 +72,27 @@ public class MetricBin {
 			String[] tokens = line.split(" ");
 			
 			// Validate the line
-			if(tokens.length != 8){
-				System.out.print("ERROR: MetricNode::parseThresholds(): did not get 8 tokens\n\n");
+			if(tokens.length != 7){
+				System.out.print("ERROR: MetricBin::parseMetrics(): did not get 7 tokens\n\n");
 				return false;
 			}
 			
+			// Depricated Code
 			// Determine if class or method
-			if(tokens[0].toLowerCase().equals("class")){
-				classes.add(true);
-			}else{
-				classes.add(false);
-			}
+//			if(tokens[0].toLowerCase().equals("class")){
+//				classes.add(true);
+//			}else{
+//				classes.add(false);
+//			}
 			
 			// Add the name of the class/method
-			names.add(tokens[1]);
+			names.add(tokens[0]);
 			
 			// Create and populate the array
 			Integer[] vals = new Integer[6];
 			
 			for(int i = 0; i < 6; i++){
-				vals[i] = Integer.parseInt(tokens[i+2]);
+				vals[i] = Integer.parseInt(tokens[i+1]);
 			}
 			metricValues.add(vals);
 		}

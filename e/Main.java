@@ -107,7 +107,7 @@ public class Main {
 		Evaluator eval = new Evaluator();
 		double bestFitness = 0.0;
 		RuleSet bestRuleSet = new RuleSet(); // Initialize it
-		SummaryBin bestSummary = null;
+		SummaryBin bestSummary = new SummaryBin();
 		
 		// Loop a whole bunch of times. Each time time, generate a RuleSet and evaluate
 		// it. If it's better than the best, save it.
@@ -257,6 +257,7 @@ public class Main {
 		}
 		
 		// Get the metrics file for system 1
+		goodData = false;
 		while(!goodData){
 			System.out.print("Enter name of file containing system two metrics: ");
 			try {

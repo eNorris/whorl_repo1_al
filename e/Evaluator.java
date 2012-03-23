@@ -83,8 +83,8 @@ public class Evaluator {
 		// the second summary. Count the matches
 		for(int i=0; i < genSummary.name.size(); i++){
 			for(int j=0; j < baseSummary.name.size(); j++){
-				if(genSummary.name.elementAt(i).equals(baseSummary.name.elementAt(j)) 
-						&& genSummary.isClass.elementAt(i).equals(baseSummary.isClass.elementAt(j))){
+				if(genSummary.name.elementAt(i).equals(baseSummary.name.elementAt(j))){ 
+//						&& genSummary.isClass.elementAt(i).equals(baseSummary.isClass.elementAt(j))){
 					numerator++;
 				}
 			}
@@ -115,8 +115,8 @@ public class Evaluator {
 		// the second summary. Count the matches
 		for(int i=0; i < genSummary.name.size(); i++){
 			for(int j=0; j < baseSummary.name.size(); j++){
-				if(genSummary.name.elementAt(i).equals(baseSummary.name.elementAt(j)) 
-						&& genSummary.isClass.elementAt(i).equals(baseSummary.isClass.elementAt(j))){
+				if(genSummary.name.elementAt(i).equals(baseSummary.name.elementAt(j))){
+//						&& genSummary.isClass.elementAt(i).equals(baseSummary.isClass.elementAt(j))){
 					numerator++;
 				}
 			}
@@ -150,7 +150,7 @@ public class Evaluator {
 			for(int j = 0; j < rules.numRules; j++){
 				// If that metric passes the rule, add it to the summary
 				if(executeRule(rules.accessRule(j), metrics, i)){
-						toReturn.isClass.add(metrics.classes.elementAt(i));
+//						toReturn.isClass.add(metrics.classes.elementAt(i));
 						toReturn.name.add(metrics.names.elementAt(i));
 						break;
 				}
